@@ -13,14 +13,12 @@ A [Hearthstone Deck Tracker](https://hsreplay.net/hdt/) plugin that reads your c
 
 ## Installation
 
-1. Download **`AmalgadonPlugin.dll`** from the [latest release](../../releases/latest).
-2. Copy it to your HDT plugins folder:
-   ```
-   %AppData%\HearthstoneDeckTracker\Plugins\
-   ```
-   _(Paste that path directly into Windows Explorer's address bar.)_
-3. (Re)start Hearthstone Deck Tracker.
-4. When prompted to enable the plugin, click **Yes**.
+- Download **`AmalgadonPlugin.dll`** from the [latest release](../../releases/latest).
+- Copy it to your HDT plugins folder: \`%AppData%\\HearthstoneDeckTracker\\Plugins\\\`
+- (Re)start Hearthstone Deck Tracker.
+- Enable the plugin in Options -> Tracker -> Plugins
+
+Alternatively, you can **drag and drop** the downloaded plugin zip folder, or extracted dll file into the Options -> Tracker -> Plugins window. You'll then have to restart HDT, and enable the plugin in Options -> Tracker -> Plugins.
 
 ---
 
