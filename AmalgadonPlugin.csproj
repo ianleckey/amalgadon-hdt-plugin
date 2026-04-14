@@ -12,7 +12,7 @@
     <Deterministic>true</Deterministic>
   </PropertyGroup>
 
-  <!-- REMOVE before committing: copies plugin DLL+PDB to HDT on every Debug build
+  <!-- REMOVE before committing: copies plugin DLL+PDB to HDT on every Debug build 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <PostBuildEvent>copy "$(TargetDir)$(AssemblyName).*" "%APPDATA%\HearthstoneDeckTracker\Plugins" /y</PostBuildEvent>
   </PropertyGroup-->

@@ -9,6 +9,8 @@ namespace AmalgadonPlugin.Controls
             InitializeComponent();
         }
 
+        public double HandleWidth => DragHandle.ActualWidth;
+
         private void OpenButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             BoardCapture.OpenCurrentBoard();
