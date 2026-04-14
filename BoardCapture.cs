@@ -1,3 +1,4 @@
+using HearthDb;
 using HearthDb.Enums;
 using Hearthstone_Deck_Tracker.Utility.Logging;
 using Newtonsoft.Json;
@@ -78,15 +79,59 @@ namespace AmalgadonPlugin
                 if (pos < 1 || pos > 7)
                     continue;
 
+                // In BG, golden minions may carry a "_G" card ID suffix, a PREMIUM tag of 1,
+                // or both. Normalise to base card ID + ":g" in all cases.
+                string cardId = entity.CardId;
                 bool golden = entity.GetTag(GameTag.PREMIUM) != 0;
-                slots[pos - 1] = golden ? entity.CardId + ":g" : entity.CardId;
+
+                if (cardId.EndsWith("_G", StringComparison.OrdinalIgnoreCase))
+                {
+                    golden = true;
+                    cardId = cardId.Substring(0, cardId.Length - 2);
+                }
+
+                slots[pos - 1] = golden ? cardId + ":g" : cardId;
             }
 
-            // Trinket detection: not implemented in v1.
-            // Investigate entities in Zone.HAND / Zone.SETASIDE with CardType == BATTLEGROUND_TRINKET
-            // once the zone / enum values are confirmed in-game.
+            // BACON_FIRST_TRINKET_DATABASE_ID (3741) and BACON_SECOND_TRINKET_DATABASE_ID (3742)
+            // are set on an entity (player, game, or hero) and hold the DBF IDs of the equipped
+            // lesser and greater trinkets respectively.
+            const GameTag TagFirstTrinket  = (GameTag)3741;
+            const GameTag TagSecondTrinket = (GameTag)3742;
+
             string lesserTrinket  = null;
             string greaterTrinket = null;
+
+            foreach (var e in Core.Game.Entities.Values)
+            {
+                int firstDbf  = e.GetTag(TagFirstTrinket);
+                int secondDbf = e.GetTag(TagSecondTrinket);
+                if (firstDbf != 0 || secondDbf != 0)
+                {
+                    if (firstDbf  != 0) lesserTrinket  = HearthDb.Cards.GetFromDbfId(firstDbf)?.Id;
+                    if (secondDbf != 0) greaterTrinket = HearthDb.Cards.GetFromDbfId(secondDbf)?.Id;
+                    Log.Info($"[Amalgadon] Trinkets via DBF tags — lt={lesserTrinket} gt={greaterTrinket}");
+                    break;
+                }
+            }
+
+            // Fallback: scan for BATTLEGROUND_TRINKET entities the player controls.
+            // Logs card IDs and zone to help diagnose if ordering is wrong.
+            if (lesserTrinket == null && greaterTrinket == null)
+            {
+                var trinkets = Core.Game.Entities.Values
+                    .Where(e =>
+                        e.IsControlledBy(Core.Game.Player.Id) &&
+                        e.GetTag(GameTag.CARDTYPE) == (int)CardType.BATTLEGROUND_TRINKET &&
+                        !string.IsNullOrEmpty(e.CardId))
+                    .ToList();
+
+                foreach (var t in trinkets)
+                    Log.Info($"[Amalgadon] Trinket entity fallback: {t.CardId} zone={t.GetTag(GameTag.ZONE)} bacon_trinket={t.GetTag((GameTag)3407)}");
+
+                if (trinkets.Count >= 1) lesserTrinket  = trinkets[0].CardId;
+                if (trinkets.Count >= 2) greaterTrinket = trinkets[1].CardId;
+            }
 
             var compact = new CompactState
             {
