@@ -1,0 +1,23 @@
+# Build output
+bin/
+obj/
+
+# HDT reference assemblies (installed locally from HDT, not redistributable)
+lib/
+
+# VSIX template files used during project setup
+HDTPluginTemplate.vsix
+HDTPluginTemplate.zip
+
+# Visual Studio / Rider user-specific files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.idea/
+
+# OS generated
+.DS_Store
+Thumbs.db
+AGENTS.md

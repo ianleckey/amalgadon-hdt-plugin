@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <UseWpf>true</UseWpf>
+    <AssemblyName>AmalgadonPlugin</AssemblyName>
+    <RootNamespace>AmalgadonPlugin</RootNamespace>
+    <!-- Match HDT's x86 process so the VS debugger can attach -->
+    <PlatformTarget>x86</PlatformTarget>
+    <!-- Keep our own AssemblyInfo.cs; suppress SDK auto-generation -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <!-- REMOVE before committing: copies plugin DLL+PDB to HDT on every Debug build
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <PostBuildEvent>copy "$(TargetDir)$(AssemblyName).*" "%APPDATA%\HearthstoneDeckTracker\Plugins" /y</PostBuildEvent>
+  </PropertyGroup-->
+
+  <ItemGroup>
+    <!-- HDT references: Private=False → not copied to output, won't land in plugin zip -->
+    <Reference Include="HearthDb">
+      <HintPath>lib\HearthDb.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HearthstoneDeckTracker">
+      <HintPath>lib\HearthstoneDeckTracker.exe</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Newtonsoft.Json ships with HDT at runtime.
+      ExcludeAssets=runtime → compile-time reference only, not copied to output.
+    -->
+    <!--
+      Use the exact version HDT ships (12.0.3). ExcludeAssets=runtime means the DLL
+      is NOT copied to our output, so we rely entirely on HDT's copy at runtime.
+      NoWarn suppresses NU1903 (vulnerability advisory) — we never ship this DLL.
+    -->
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+      <NoWarn>NU1903</NoWarn>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- Exclude extracted VSIX template files from the build globs -->
+  <ItemGroup>
+    <Compile Remove="_vsix_extracted\**" />
+    <Page Remove="_vsix_extracted\**" />
+    <None Remove="_vsix_extracted\**" />
+    <EmbeddedResource Remove="_vsix_extracted\**" />
+  </ItemGroup>
+
+</Project>
