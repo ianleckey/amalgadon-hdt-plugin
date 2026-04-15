@@ -80,7 +80,8 @@ namespace AmalgadonPlugin
                     continue;
 
                 // In BG, golden minions may carry a "_G" card ID suffix, a PREMIUM tag of 1,
-                // or both. Normalise to base card ID + ":g" in all cases.
+                // or a TB_BaconUps_ prefix (the triple-upgrade golden variant), or any combination.
+                // Normalise to base card ID + ":g" in all cases.
                 string cardId = entity.CardId;
                 bool golden = entity.GetTag(GameTag.PREMIUM) != 0;
 
@@ -88,6 +89,13 @@ namespace AmalgadonPlugin
                 {
                     golden = true;
                     cardId = cardId.Substring(0, cardId.Length - 2);
+                }
+
+                // TB_BaconUps_* cards are the golden variants; resolve back to the base card ID.
+                if (HearthDb.Cards.TripleToNormalCardIds.TryGetValue(cardId, out string baseCardId))
+                {
+                    golden = true;
+                    cardId = baseCardId;
                 }
 
                 slots[pos - 1] = golden ? cardId + ":g" : cardId;
