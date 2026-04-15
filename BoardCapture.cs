@@ -98,7 +98,13 @@ namespace AmalgadonPlugin
                     cardId = baseCardId;
                 }
 
-                slots[pos - 1] = golden ? cardId + ":g" : cardId;
+                var flags = new System.Text.StringBuilder();
+                if (golden)                                      flags.Append('g');
+                if (entity.GetTag(GameTag.TAUNT)        != 0)   flags.Append('t');
+                if (entity.GetTag(GameTag.DIVINE_SHIELD) != 0)  flags.Append('d');
+                if (entity.GetTag(GameTag.REBORN)        != 0)  flags.Append('r');
+
+                slots[pos - 1] = flags.Length > 0 ? cardId + ":" + flags : cardId;
             }
 
             // BACON_FIRST_TRINKET_DATABASE_ID (3741) and BACON_SECOND_TRINKET_DATABASE_ID (3742)
